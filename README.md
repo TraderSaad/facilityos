@@ -1,121 +1,54 @@
 # FacilityOS
 
-Enterprise Facilities Management SaaS — Foundation Layer.
+Enterprise Facilities Management SaaS — Phase 1B scaffold.
 
-## Tech Stack
+## Workspace Layout
 
-- **Frontend:** Next.js 14, TypeScript, TailwindCSS, ShadCN UI
-- **Backend:** NestJS, Prisma ORM
-- **Database:** PostgreSQL, Redis
-- **Infra:** Docker Compose
+- `apps/web` — Public Next.js storefront and authentication flow
+- `apps/admin` — Admin portal shell
+- `services/identity-service` — NestJS authentication service
+- `services/tenant-service` — NestJS tenant management service
+- `services/api-gateway` — NestJS API gateway with JWT validation
+- `packages/ui` — Shared React UI components
+- `packages/types` — Shared TypeScript types
+- `packages/utils` — Shared utility helpers
+- `packages/config` — Shared configuration helpers
+- `prisma` — Prisma schema and migrations
+- `docker` — Docker Compose starter
+- `scripts` — local helper scripts
+- `docs` — documentation
 
-## Monorepo Structure
+## Getting Started
 
-```
-facilityos/
-├── apps/
-│   ├── web/          # Main application shell
-│   └── admin/        # Admin shell
-├── services/
-│   ├── identity-service/
-│   ├── tenant-service/
-│   └── api-gateway/
-├── packages/
-│   ├── ui/           # Shared ShadCN components
-│   ├── types/        # Shared TypeScript types
-│   ├── utils/        # Logger, events, password utils
-│   └── config/       # Shared configuration
-├── prisma/           # Database schema & migrations
-├── docker/           # Docker Compose & Dockerfiles
-├── scripts/          # Setup scripts
-└── docs/             # Documentation
-```
-
-## Quick Start (DEV-LITE)
-
-No Docker, database, or backend services required. UI runs with mock authentication.
-
-### Prerequisites
-
-- Node.js 20+
-
-### Run
+1. Install dependencies:
 
 ```bash
 npm install
-npm run dev
 ```
 
-Open **http://localhost:3000** and sign in:
-
-| Field | Value |
-|-------|-------|
-| Email | `admin@demo.com` |
-| Password | `123456` |
-
-After login you are redirected to the dashboard shell. All data comes from `apps/web/src/lib/mock-api.ts`.
-
----
-
-## Full Stack (optional)
-
-Requires Docker, PostgreSQL, and backend services.
+2. Generate the Prisma client:
 
 ```bash
-.\scripts\dev-setup.ps1   # Windows
-./scripts/dev-setup.sh    # macOS/Linux
-npm run dev:full
+npm run prisma:generate
 ```
 
-Or via Docker:
+3. Start local database infrastructure:
 
 ```bash
 npm run docker:up
 ```
 
-### Full Stack URLs
+This repository currently focuses on the Prisma database foundation, including PostgreSQL and Redis infrastructure.
 
-| Service | URL |
-|---------|-----|
-| API Gateway | http://localhost:3000 |
-| Web App (with API) | http://localhost:3100 |
-| Admin App | http://localhost:3200 |
-| Identity Service | http://localhost:3001 |
-| Tenant Service | http://localhost:3002 |
+## Backend APIs
 
-### Full Stack Demo Credentials
+- `POST /auth/register` — register a new user
+- `POST /auth/login` — login and receive a JWT
+- `GET /auth/profile` — retrieve the authenticated user profile
+- `POST /tenants` — create a new tenant
+- `GET /tenants` — list tenants
+- `GET /tenants/:id` — retrieve tenant details
 
-After database seeding:
+## Environment
 
-- **Organization:** `demo-corp`
-- **Email:** `admin@demo-corp.com`
-- **Password:** `Admin123!`
-
-## API Endpoints
-
-### Identity Service (via Gateway)
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/auth/register` | No | Register user |
-| POST | `/auth/login` | No | Login |
-| GET | `/auth/profile` | Yes | Get profile |
-
-### Tenant Service (via Gateway)
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/tenants` | No | Create tenant |
-| GET | `/tenants` | Yes | List tenants |
-| GET | `/tenants/:id` | Yes | Get tenant |
-| POST | `/tenants/:id/users` | Yes | Assign user |
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and adjust as needed.
-
-## What's NOT Included (Step 2+)
-
-- CRM, Work Orders, AI, Digital Twin
-- Kafka event streaming
-- Kubernetes deployment
+Copy `.env.example` to `.env` and update values as needed.

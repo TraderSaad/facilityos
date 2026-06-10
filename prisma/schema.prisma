@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?  @unique
+  phone      String?
+  source     String?
+  status     String   @default("new")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  notes      Note[]
+  activities Activity[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  client    Client?  @relation(fields: [clientId], references: [id])
+  clientId  String?
+  role      String?
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  address    String?
+  contacts   Contact[]
+  opportunities Opportunity[]
+  tenders    Tender[]
+  createdAt  DateTime @default(now())
+}
+
+model Opportunity {
+  id             String   @id @default(cuid())
+  title          String
+  client         Client?  @relation(fields: [clientId], references: [id])
+  clientId       String?
+  stage          String   @default("prospect")
+  priority       String?  
+  expectedValue  Float?
+  probability    Int?     
+  assignedTo     String?  
+  notes          Note[]
+  activities     Activity[]
+  createdAt      DateTime @default(now())
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  subject     String
+  details     String?
+  dueAt       DateTime?
+  completed   Boolean  @default(false)
+  lead        Lead?    @relation(fields: [leadId], references: [id])
+  leadId      String?
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id])
+  opportunityId String?
+  createdAt   DateTime @default(now())
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  body      String
+  author    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+  leadId    String?
+  opp       Opportunity? @relation(fields: [opportunityId], references: [id])
+  opportunityId String?
+  createdAt DateTime @default(now())
+}
+
+model Tender {
+  id             String   @id @default(cuid())
+  tenderNumber   String   @unique
+  title          String
+  client         Client?  @relation(fields: [clientId], references: [id])
+  clientId       String?
+  submissionDate DateTime?
+  siteSurveyAt   DateTime?
+  scopeOfWork    String?
+  status         String   @default("new")
+  documents      BidDocument[]
+  boqItems       BOQItem[]
+  clarifications Clarification[]
+  createdAt      DateTime @default(now())
+}
+
+model BidDocument {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  tender    Tender?  @relation(fields: [tenderId], references: [id])
+  tenderId  String?
+  uploadedAt DateTime @default(now())
+}
+
+model BOQItem {
+  id        String   @id @default(cuid())
+  description String
+  quantity  Float
+  unitPrice Float
+  tender    Tender?  @relation(fields: [tenderId], references: [id])
+  tenderId  String?
+}
+
+model Clarification {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String?
+  askedAt   DateTime @default(now())
+  tender    Tender?  @relation(fields: [tenderId], references: [id])
+  tenderId  String?
+}
+
+model Quotation {
+  id           String   @id @default(cuid())
+  title        String
+  client       Client?  @relation(fields: [clientId], references: [id])
+  clientId     String?
+  totalValue   Float?   
+  vatPercent   Float?   
+  createdAt    DateTime @default(now())
+  lines        QuotationLine[]
+}
+
+model QuotationLine {
+  id          String   @id @default(cuid())
+  description String
+  category    String
+  quantity    Float
+  unitPrice   Float
+  quotation   Quotation? @relation(fields: [quotationId], references: [id])
+  quotationId String?
+}
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]
+  roles     Role[]
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  password   String
+  name       String?
+  tenantId   String
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  roles      UserRole[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Role {
+  id         String       @id @default(uuid())
+  name       String
+  tenantId   String
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  permissions Permission[] @relation("RolePermissions")
+  userRoles  UserRole[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([name, tenantId])
+}
+
+model Permission {
+  id         String   @id @default(uuid())
+  action     String
+  resource   String
+  roles      Role[]   @relation("RolePermissions")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([action, resource])
+}
+
+model UserRole {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  role       Role     @relation(fields: [roleId], references: [id])
+  roleId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, roleId])
+}

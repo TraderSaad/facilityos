@@ -1,0 +1,10 @@
+{
+  "name": "@facilityos/ui",
+  "private": true,
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  }
+}

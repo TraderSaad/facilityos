@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@facilityos/ui": ["packages/ui/src"],
+      "@facilityos/types": ["packages/types/src"],
+      "@facilityos/utils": ["packages/utils/src"],
+      "@facilityos/config": ["packages/config/src"]
+    }
+  }
+}
