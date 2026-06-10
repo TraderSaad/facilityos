@@ -1,0 +1,43 @@
+{
+  "name": "facilityos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FacilityOS - Enterprise Facilities Management SaaS",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev -w @facilityos/web",
+    "dev:full": "concurrently -n identity,tenant,gateway,web -c blue,green,yellow,magenta \"npm run dev -w @facilityos/identity-service\" \"npm run dev -w @facilityos/tenant-service\" \"npm run dev -w @facilityos/api-gateway\" \"npm run dev -w @facilityos/web:api\"",
+    "dev:identity": "npm run dev -w @facilityos/identity-service",
+    "dev:tenant": "npm run dev -w @facilityos/tenant-service",
+    "dev:gateway": "npm run dev -w @facilityos/api-gateway",
+    "dev:web": "npm run dev -w @facilityos/web",
+    "db:generate": "prisma generate --schema=prisma/schema.prisma",
+    "db:migrate": "prisma migrate deploy --schema=prisma/schema.prisma",
+    "db:migrate:dev": "prisma migrate dev --schema=prisma/schema.prisma",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio --schema=prisma/schema.prisma",
+    "docker:up": "docker compose -f docker/docker-compose.yml up --build",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.11.0",
+    "concurrently": "^8.2.2",
+    "prisma": "^5.22.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^5.1.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
